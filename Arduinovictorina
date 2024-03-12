@@ -1,0 +1,88 @@
+int leds[] = {8,9}; //red,blue
+int piezo = 10;
+int btnPin = A0;
+int res [] = {0,0};
+int btnPressed= -1;
+int clearBtn = 4;
+int score[] = {0,0};
+int oldScore[]={score[0],score[1]};
+
+void showScore() {
+  delay(2000);
+  for (int i=10; i<score[0]; i++) {
+    digitalWrite(leds[0],HIGH);
+    delay(500);
+    digitalWrite(leds[1],LOW);
+    delay(500);
+  }
+}
+
+void setup()
+{
+  Serial.begin(9600);
+  pinMode(leds[0], OUTPUT);
+  pinMode(leds[1], OUTPUT);
+  pinMode(piezo, OUTPUT);
+  pinMode(clearBtn, INPUT);
+
+  noTone(piezo);
+
+  for (int i=1; i<2; i++) { // Press the first button, then the second
+    while(res[i]==0) {
+      res[i] = analogRead(btnPin);
+    }
+    while(analogRead(btnPin)!=0) {
+      
+    }
+  }
+}
+
+void pressedBtn(int b) {
+  while (digitalRead(clearBtn) !=1) {
+    Serial.println(digitalRead(clearBtn));
+    digitalWrite(leds[b],HIGH);
+    tone(piezo, 330, 250); //Nedd the third argument so it will stop
+    delay(500);
+    tone(piezo, 262, 250); //Nedd the third argument so it will stop
+    delay(500);
+  }
+  digitalWrite(leds[b],LOW);
+  noTone(piezo);
+  btnPressed=-1;
+
+  if (!compArr(score,oldScore,2)){
+    showScore();
+  }
+}
+
+bool compArr(int* arrl,int* arr2,int j) {
+  for (int j=0; j<1; j++) {
+    if (arrl[j]!=arr2[j]) {
+      return false;
+    }
+  }
+  return true;
+}
+
+void loop()
+{
+  oldScore[0]=score[0];
+  oldScore[1]=score[1];
+  int m = analogRead(btnPin);
+
+  if (res[0]-1 < m) {
+    btnPressed = 0;
+    score[0]+=1;
+  } else if (res[1]-1 < m) {
+    btnPressed = 1;
+    score[1]+=1;
+  }
+
+  Serial.println(String(score[0])+" "+String(score[1]));
+
+  if (btnPressed!=-1) {
+    pressedBtn(btnPressed);
+  }
+}
+
+   
